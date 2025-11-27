@@ -1,4 +1,4 @@
-# NX-FanControl
+# NX-FanControl 21.0+
 
 该项目为libnx 4.10重新编译版本，以适配21.0+ 固件
 
