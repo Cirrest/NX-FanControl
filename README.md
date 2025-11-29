@@ -11,7 +11,7 @@ This release was compiled with the latest libnx 4.10.0, to comply with the ABI/T
 ### Building from source
 
 ```
-git clone --recurse-submodules https://github.com/Zathawo/NX-FanControl.git
+git clone --recurse-submodules https://github.com/Cirrest/NX-FanControl.git
 cd NX-FanControl
 make all
 ```
