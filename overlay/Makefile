@@ -38,25 +38,31 @@ include $(DEVKITPRO)/libnx/switch_rules
 #   NACP building is skipped as well.
 #---------------------------------------------------------------------------------
 APP_TITLE	:=	NX-FanControl
-APP_VERSION :=	1.0.3+
+APP_VERSION :=	1.0.3+r4
 
 TARGET		:=	$(APP_TITLE)
 BUILD		:=	build
-SOURCES		:=	source lib/libultrahand/libultra/source
+SOURCES		:=	source
 DATA		:=	data
-INCLUDES	:=	include lib/libultrahand/libultra/include lib/libultrahand/libtesla/include ../lib/libfancontrol/include
+INCLUDES	:=	include ../lib/libfancontrol/include
 
 NO_ICON		:=  1
+
+
+# This location should reflect where you place the libultrahand directory (lib can vary between projects).
+include ${TOPDIR}/lib/libultrahand/ultrahand.mk
 
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
-CFLAGS	:=	-g -Wall -O2 -ffunction-sections \
-			$(ARCH) $(DEFINES)
+CFLAGS := -g -Wall -O3 -ffunction-sections -fdata-sections -flto \
+          -fuse-linker-plugin -fomit-frame-pointer -finline-small-functions \
+          -fno-strict-aliasing -frename-registers -falign-functions=16 \
+          $(ARCH) $(DEFINES)
 
-CFLAGS	+=	$(INCLUDE) -D__SWITCH__
+CFLAGS += $(INCLUDE) -D__SWITCH__ -DAPP_VERSION="\"$(APP_VERSION)\"" -D_FORTIFY_SOURCE=2
 
 # Enable appearance overriding
 UI_OVERRIDE_PATH := /config/NX-FanControl/
@@ -64,18 +70,23 @@ CFLAGS += -DUI_OVERRIDE_PATH="\"$(UI_OVERRIDE_PATH)\""
 
 # For theme / wallpaper loading in GUI class method (add to project if theme does not appear)
 INITIALIZE_IN_GUI_DIRECTIVE := 1
-CFLAGS += -DINITIALIZE_IN_GUI_DIRECTIVE=$(INITIALIZE_IN_GUI_DIRECTIVE)
+CFLAGS += -DINITIALIZE_IN_GUI_DIRECTIVE=1
 
-# Disable fstream
-NO_FSTREAM_DIRECTIVE := 1
-CFLAGS += -DNO_FSTREAM_DIRECTIVE=$(NO_FSTREAM_DIRECTIVE)
+# Exception wrap utilization (for smaller compilation size)
+CFLAGS += -DUSE_EXCEPTION_WRAP=1
 
-CXXFLAGS	:= $(CFLAGS) -fno-exceptions -std=c++20
+# Requires USE_EXCEPTION_WRAP and inclusion of exception_wrap.hpp in main
+LDFLAGS += -Wl,-wrap,__cxa_throw \
+           -Wl,-wrap,_Unwind_Resume \
+           -Wl,-wrap,__gxx_personality_v0
+
+
+CXXFLAGS := $(CFLAGS) -std=c++26 -Wno-dangling-else -ffast-math -fno-unwind-tables -fno-asynchronous-unwind-tables 
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= -lcurl -lz -lzzip -lmbedtls -lmbedx509 -lmbedcrypto -ljansson -lnx ../../lib/libfancontrol/lib/libfancontrol.a
+LIBS := -lcurl -lz -lminizip -lmbedtls -lmbedx509 -lmbedcrypto -lnx ../../lib/libfancontrol/lib/libfancontrol.a
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
@@ -200,6 +211,8 @@ all	:	 $(OUTPUT).ovl
 $(OUTPUT).ovl		:	$(OUTPUT).elf $(OUTPUT).nacp 
 	@elf2nro $< $@ $(NROFLAGS)
 	@echo "built ... $(notdir $(OUTPUT).ovl)"
+	@printf 'ULTR' >> $@
+	@printf "Ultrahand signature has been added.\n"
 
 $(OUTPUT).elf	:	$(OFILES)
 
