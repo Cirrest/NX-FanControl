@@ -1,3 +1,4 @@
+// [汉化] NX-FanControl 简体中文版（插件名与作者名保留原文）
 #include "select_menu.hpp"
 #include "utils.hpp"
 
@@ -7,7 +8,7 @@ SelectMenu::SelectMenu(int i, TemperaturePoint* fanCurveTable, bool* tableIsChan
     this->_fanCurveTable = fanCurveTable;
     this->_tableIsChanged = tableIsChanged;
 
-    this->_saveBtn = new tsl::elm::ListItem("Save");
+    this->_saveBtn = new tsl::elm::ListItem("保存");
     this->_tempLabel = new tsl::elm::CategoryHeader(std::to_string((this->_fanCurveTable + this->_i)->temperature_c) + "°C", true);
     this->_fanLabel = new tsl::elm::CategoryHeader(std::to_string((int)((this->_fanCurveTable + this->_i)->fanLevel_f * 100)) + "%", true);
 }
@@ -22,7 +23,7 @@ tsl::elm::Element* SelectMenu::createUI(){
     {
         this->_tempLabel->setText(std::to_string(value) + "°C");
         (this->_fanCurveTable + this->_i)->temperature_c = value;
-        this->_saveBtn->setText("Save");
+        this->_saveBtn->setText("保存");
     });
     trackTemp->setProgress((this->_fanCurveTable + this->_i)->temperature_c);
     list->addItem(trackTemp);
@@ -33,7 +34,7 @@ tsl::elm::Element* SelectMenu::createUI(){
     {
         this->_fanLabel->setText(std::to_string(value) + "%");
         (this->_fanCurveTable + this->_i)->fanLevel_f = (float)value / 100;
-        this->_saveBtn->setText("Save");
+        this->_saveBtn->setText("保存");
     });
     trackFanL->setProgress((int)((this->_fanCurveTable + this->_i)->fanLevel_f * 100));
     list->addItem(trackFanL);
@@ -58,7 +59,7 @@ tsl::elm::Element* SelectMenu::createUI(){
                 pmshellLaunchProgram(0, &programLocation, &pid);
             }
                 
-            this->_saveBtn->setText("Saved!");
+            this->_saveBtn->setText("已保存！");
             *this->_tableIsChanged = true;
             return true;
         }

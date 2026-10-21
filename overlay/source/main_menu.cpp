@@ -1,3 +1,4 @@
+// [汉化] NX-FanControl 简体中文版（插件名与作者名保留原文）
 #include "main_menu.hpp"
 #include "select_menu.hpp"
 
@@ -13,11 +14,11 @@ MainMenu::MainMenu()
 
     if (IsRunning() != 0)
     {
-        this->_enabledBtn = new tsl::elm::ToggleListItem("Enabled", true);
+        this->_enabledBtn = new tsl::elm::ToggleListItem("启用", true);
     }
     else
     {
-        this->_enabledBtn = new tsl::elm::ToggleListItem("Enabled", false);
+        this->_enabledBtn = new tsl::elm::ToggleListItem("启用", false);
     }
 }
 
@@ -50,7 +51,7 @@ tsl::elm::Element* MainMenu::createUI()
     });
     list->addItem(this->_enabledBtn);
 
-    list->addItem(new tsl::elm::CategoryHeader("Fan Curve", true));
+    list->addItem(new tsl::elm::CategoryHeader("风扇曲线", true));
     this->_p0Label->setClickListener([this](uint64_t keys)
     {
         if (keys & HidNpadButton_A) 
